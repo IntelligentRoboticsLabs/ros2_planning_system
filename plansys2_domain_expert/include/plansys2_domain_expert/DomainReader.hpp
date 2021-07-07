@@ -26,6 +26,7 @@ struct Domain
   std::string name;
   std::string requirements;
   std::string types;
+  std::string constants;
   std::string predicates;
   std::string functions;
   std::vector<std::string> actions;
@@ -46,6 +47,7 @@ protected:
   std::string get_name(std::string & domain);
   std::string get_requirements(std::string & domain);
   std::string get_types(const std::string & domain);
+  std::string get_constants(const std::string & domain);
   std::string get_predicates(const std::string & domain);
   std::string get_functions(const std::string & domain);
   std::vector<std::string> get_actions(const std::string & domain);

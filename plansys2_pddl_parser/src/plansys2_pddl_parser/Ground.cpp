@@ -28,8 +28,17 @@ plansys2_msgs::msg::Node::SharedPtr Ground::getTree( plansys2_msgs::msg::Tree & 
     node->name = name;
     for ( unsigned i = 0; i < params.size(); ++i ) {
         plansys2_msgs::msg::Param param;
-        if (i < replace.size()) {
-          param.name = replace[params[i]];
+        if (i < replace.size()){
+          if (params[i] > 0)  // param has a variable value; replace by action-args
+          {
+            param.name = replace[params[i]];
+          }
+           else                // param has a constant value; retrive from domain::type[t_i]::constants[c_i]
+          {
+            int type_idx = lifted->params[i];            // idx of the type of this param [ref: d.type]
+            int constant_idx = (-1 * params[i]) -1;      // idx of the constant value [ref: d.type.constant]
+            param.name = d.types[type_idx]->constants[constant_idx]; // the actual constant value
+          }
         } else if (d.types[lifted->params[i]]->objects.size() > params[i]) {
           param.name = d.types[lifted->params[i]]->object( params[i] ).first;
         } else {

@@ -51,6 +51,7 @@ DomainReader::add_domain(const std::string & domain)
   new_domain.name = get_name(lc_domain);
   new_domain.requirements = get_requirements(lc_domain);
   new_domain.types = get_types(lc_domain);
+  new_domain.constants = get_constants(lc_domain);
   new_domain.predicates = get_predicates(lc_domain);
   new_domain.functions = get_functions(lc_domain);
   new_domain.actions = get_actions(lc_domain);
@@ -79,6 +80,14 @@ DomainReader::get_joint_domain() const
   for (auto & domain : domains_) {
     if (!domain.types.empty()) {
       ret += domain.types + "\n";
+    }
+  }
+  ret += ")\n\n";
+
+  ret += "(:constants\n";
+  for (auto & domain : domains_) {
+    if (!domain.constants.empty()) {
+      ret += domain.constants + "\n";
     }
   }
   ret += ")\n\n";
@@ -210,6 +219,29 @@ DomainReader::get_types(const std::string & domain)
     return "";
   }
 }
+
+
+std::string
+DomainReader::get_constants(const std::string & domain)
+{
+  const std::string pattern(":constants");
+
+  std::size_t init_pos = domain.find(pattern);
+  if (init_pos == std::string::npos) {
+    return "";
+  }
+  init_pos += pattern.length();
+
+  auto end_pos = get_end_block(domain, init_pos);
+
+  if (end_pos >= 0) {
+    std::string ret = substr_without_empty_lines(domain, init_pos, end_pos);
+    return ret;
+  } else {
+    return "";
+  }
+}
+
 
 std::string
 DomainReader::get_predicates(const std::string & domain)
