@@ -109,9 +109,13 @@ ProblemExpert::getPredicates()
 bool
 ProblemExpert::addPredicate(const plansys2::Predicate & predicate)
 {
-  if (!existPredicate(predicate)) {
-    if (isValidPredicate(predicate)) {
-      predicates_.push_back(predicate);
+  plansys2::Predicate predicate_lower = predicate;
+  std::transform(predicate.name.begin(), predicate.name.end(), predicate_lower.name.begin(),
+    [](unsigned char c){ return std::tolower(c);});
+
+  if (!existPredicate(predicate_lower)) {
+    if (isValidPredicate(predicate_lower)) {
+      predicates_.push_back(predicate_lower);
       return true;
     } else {
       return false;
@@ -127,11 +131,15 @@ ProblemExpert::removePredicate(const plansys2::Predicate & predicate)
   bool found = false;
   int i = 0;
 
-  if (!isValidPredicate(predicate)) {  // if predicate is not valid, error
+  plansys2::Predicate predicate_lower = predicate;
+  std::transform(predicate.name.begin(), predicate.name.end(), predicate_lower.name.begin(),
+    [](unsigned char c){ return std::tolower(c);});
+
+  if (!isValidPredicate(predicate_lower)) {  // if predicate is not valid, error
     return false;
   }
   while (!found && i < predicates_.size()) {
-    if (parser::pddl::checkNodeEquality(predicates_[i], predicate)) {
+    if (parser::pddl::checkNodeEquality(predicates_[i], predicate_lower)) {
       found = true;
       predicates_.erase(predicates_.begin() + i);
     }
@@ -144,8 +152,12 @@ ProblemExpert::removePredicate(const plansys2::Predicate & predicate)
 std::optional<plansys2::Predicate>
 ProblemExpert::getPredicate(const std::string & expr)
 {
+  std::string expr_lower = expr;
+  std::transform(expr.begin(), expr.end(), expr_lower.begin(),
+    [](unsigned char c){ return std::tolower(c);});
+
   plansys2::Predicate ret;
-  plansys2::Predicate pred = parser::pddl::fromStringPredicate(expr);
+  plansys2::Predicate pred = parser::pddl::fromStringPredicate(expr_lower);
 
   bool found = false;
   size_t i = 0;
